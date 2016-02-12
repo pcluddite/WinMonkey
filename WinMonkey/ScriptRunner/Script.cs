@@ -2,16 +2,16 @@
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.Serialization;
-using System.Threading;
 using System.Windows.Forms;
 using System.Xml;
-using Tbasic.Runtime;
 using Timer = System.Windows.Forms.Timer;
 
 namespace WinMonkey
 {
     public class Script
     {
+        private static readonly string AutoItPath = Path.Combine(Application.StartupPath, "AutoIt3.exe");
+
         public ScriptLanguage Language
         {
             get; set;
@@ -140,15 +140,12 @@ namespace WinMonkey
                 case ScriptLanguage.AutoIt3:
                     RunAu3();
                     break;
-                case ScriptLanguage.TBASIC:
-                    RunTbasic();
-                    break;
                 default:
                     RunNative(FilePath, "");
                     break;
             }
         }
-        private static readonly string AutoItPath = Path.Combine(Application.StartupPath, "AutoIt3.exe");
+
         private void RunAu3()
         {
             if (File.Exists(AutoItPath)) {
@@ -167,21 +164,6 @@ namespace WinMonkey
                 scriptProc.StartInfo.Arguments = args;
                 scriptProc.Start();
             }
-        }
-        private void RunTbasic()
-        {
-            (new Thread(new ParameterizedThreadStart(
-                path => {
-                    try {
-                        Executer tbasic = new Executer();
-                        tbasic.Global.LoadStandardLibrary();
-                        tbasic.Execute(File.ReadAllLines(path + ""));
-                    }
-                    catch (Exception ex) {
-                        MessageBox.Show("An error occoured\n" + ex.Message, "Window Monkey", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                }
-            ))).Start(Path.GetFullPath(FilePath));
         }
 
         public static Script FromXmlNode(XmlNode node)
