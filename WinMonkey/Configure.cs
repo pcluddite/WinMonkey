@@ -15,20 +15,24 @@ namespace WinMonkey
         private ScriptManager scriptMan;
         private PipeWatcher pipeWatcher;
         private Settings settings;
-
-        private bool showform;
+        
         private bool skipCloseWarning = false;
+        private bool allowVisible = false;
 
         private readonly string SettingsPath = Path.Combine(Application.StartupPath, "Settings.xml");
         private const string RUN_KEY_PATH = @"Software\Microsoft\Windows\CurrentVersion\Run";
-
+        
         public Configure(bool show)
         {
-            showform = show;
             pipeWatcher = new PipeWatcher(this);
             pipeWatcher.Begin();
             settings = new Settings();
             InitializeComponent();
+            allowVisible = show;
+        }
+
+        private void Configure_Load(object sender, EventArgs e)
+        {
             settings.Load(SettingsPath);
 
             showTrayMessagesToolStripMenuItem.Checked = settings.GetBool("notify", true);
@@ -58,19 +62,14 @@ namespace WinMonkey
             enableButton_Click(null, EventArgs.Empty);
         }
 
-        private void Configure_Load(object sender, EventArgs e)
-        {
-
-        }
-
         protected override void SetVisibleCore(bool value)
         {
-            if (showform) {
+            if (allowVisible) {
                 base.SetVisibleCore(value);
             }
             else {
                 base.SetVisibleCore(false);
-                showform = true;
+                allowVisible = true;
             }
         }
 

@@ -11,9 +11,7 @@ namespace WinMonkey
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Configure(
-                !(args.Length > 0 && args.Contains("-startup", StringComparer.OrdinalIgnoreCase))
-                ));
+            Application.Run(new Configure(!(args.Length > 0 && args.Contains("-startup", StringComparer.OrdinalIgnoreCase))));
         }
     }
 }
