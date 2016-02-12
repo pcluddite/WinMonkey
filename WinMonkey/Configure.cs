@@ -74,6 +74,82 @@ namespace WinMonkey
             }
         }
 
+        private void Configure_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (!skipCloseWarning && e.CloseReason == CloseReason.UserClosing) {
+                DialogResult result = MessageBox.Show(this, "If you close WindowMonkey, it will be unable to listen to events and run scripts automatically. Are you sure you want to quit?", "WindowMonkey", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (result == DialogResult.No) {
+                    e.Cancel = true;
+                    skipCloseWarning = false;
+                    return;
+                }
+            }
+            RunOnStartup(checkBox1.Checked);
+
+            settings.Set("notify", showTrayMessagesToolStripMenuItem.Checked);
+
+            XmlNode scriptsNode = settings.DocumentElement.SelectSingleNode("scripts");
+            if (scriptsNode == null) {
+                scriptsNode = settings.Document.CreateElement("scripts");
+                settings.DocumentElement.AppendChild(scriptsNode);
+            }
+            else {
+                scriptsNode.RemoveAll();
+            }
+
+            foreach (Script s in scriptMan.GetScripts()) {
+                scriptsNode.AppendChild(s.ToXmlNode(settings.Document));
+            }
+
+            try {
+                settings.Save(SettingsPath);
+            }
+            catch (Exception ex) {
+                if (MessageBox.Show(this, ex.Message + "\nBasically, there was a problem saving your settings file. If you exit now, your settings won't be saved. Do you still want to quit?", Text, MessageBoxButtons.YesNo, MessageBoxIcon.Error) == System.Windows.Forms.DialogResult.No) {
+                    e.Cancel = true;
+                    return;
+                }
+            }
+            notifyIcon.Visible = false;
+        }
+
+        private void Configure_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            try {
+                scriptMan.Watcher.EndWatch();
+                PipeWatcher.SendBreakRequest();
+            }
+            catch {
+            }
+            finally {
+                //Environment.Exit(0);
+            }
+        }
+
+        private void RunOnStartup(bool doRun)
+        {
+            try {
+                using (RegistryKey runKey = Registry.CurrentUser.OpenSubKey(RUN_KEY_PATH, true)) {
+                    if (doRun) {
+                        runKey.SetValue("WinMonkey", "\"" + Application.ExecutablePath + "\" -startup");
+                    }
+                    else if (runKey.GetValueNames().Contains("WinMonkey")) {
+                        runKey.DeleteValue("WinMonkey");
+                    }
+                }
+            }
+            catch (SecurityException) {
+                MessageBox.Show("You do not have permission to run this program on startup. Try running as an administrator.", "WindowMonkey", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private static bool IsStartup()
+        {
+            using (RegistryKey runKey = Registry.CurrentUser.OpenSubKey(RUN_KEY_PATH)) {
+                return runKey.GetValueNames().Contains("WinMonkey");
+            }
+        }
+
         private void enableButton_Click(object sender, EventArgs e)
         {
             if (scriptMan.Watcher.Running) {
@@ -125,81 +201,6 @@ namespace WinMonkey
         {
             Show();
             WindowState = FormWindowState.Normal;
-        }
-
-        private void Configure_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            try {
-                scriptMan.Watcher.EndWatch();
-            }
-            catch {
-            }
-            finally {
-                Environment.Exit(0);
-            }
-        }
-
-        private void RunOnStartup(bool doRun)
-        {
-            try {
-                using (RegistryKey runKey = Registry.CurrentUser.OpenSubKey(RUN_KEY_PATH, true)) {
-                    if (doRun) {
-                        runKey.SetValue("WinMonkey", "\"" + Application.ExecutablePath + "\" -startup");
-                    }
-                    else if (runKey.GetValueNames().Contains("WinMonkey")) {
-                        runKey.DeleteValue("WinMonkey");
-                    }
-                }
-            }
-            catch (SecurityException) {
-                MessageBox.Show("You do not have permission to run this program on startup. Try running as an administrator.", "WindowMonkey", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        private static bool IsStartup()
-        {
-            using (RegistryKey runKey = Registry.CurrentUser.OpenSubKey(RUN_KEY_PATH)) {
-                return runKey.GetValueNames().Contains("WinMonkey");
-            }
-        }
-
-        private void Configure_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            if (!skipCloseWarning && e.CloseReason == CloseReason.UserClosing) {
-                DialogResult result = MessageBox.Show(this, "If you close WindowMonkey, it will be unable to listen to events and run scripts automatically. Are you sure you want to quit?", "WindowMonkey", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                if (result == DialogResult.No) {
-                    e.Cancel = true;
-                    skipCloseWarning = false;
-                    return;
-                }
-            }
-            RunOnStartup(checkBox1.Checked);
-
-            settings.Set("notify", showTrayMessagesToolStripMenuItem.Checked);
-
-            XmlNode scriptsNode = settings.DocumentElement.SelectSingleNode("scripts");
-            if (scriptsNode == null) {
-                scriptsNode = settings.Document.CreateElement("scripts");
-                settings.DocumentElement.AppendChild(scriptsNode);
-            }
-            else {
-                scriptsNode.RemoveAll();
-            }
-
-            foreach (Script s in scriptMan.GetScripts()) {
-                scriptsNode.AppendChild(s.ToXmlNode(settings.Document));
-            }
-
-            try {
-                settings.Save(SettingsPath);
-            }
-            catch (Exception ex) {
-                if (MessageBox.Show(this, ex.Message + "\nBasically, there was a problem saving your settings file. If you exit now, your settings won't be saved. Do you still want to quit?", Text, MessageBoxButtons.YesNo, MessageBoxIcon.Error) == System.Windows.Forms.DialogResult.No) {
-                    e.Cancel = true;
-                    return;
-                }
-            }
-            notifyIcon.Visible = false;
         }
 
         private void exitWindowMonkeyToolStripMenuItem_Click(object sender, EventArgs e)

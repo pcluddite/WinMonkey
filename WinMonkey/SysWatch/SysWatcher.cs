@@ -43,6 +43,8 @@ namespace WinMonkey
             }
         }
 
+        public bool Cancel { get; set; }
+
         private BackgroundWorker winListener, procListener;
 
         public void BeginWatch()
@@ -63,6 +65,8 @@ namespace WinMonkey
         public void Dispose()
         {
             EndWatch();
+            winListener.Dispose();
+            procListener.Dispose();
         }
 
         public void EndWatch()
@@ -70,8 +74,7 @@ namespace WinMonkey
             if (Running) {
                 winListener.CancelAsync();
                 procListener.CancelAsync();
-                winListener.Dispose();
-                procListener.Dispose();
+                Cancel = true;
             }
         }
 
@@ -94,7 +97,7 @@ namespace WinMonkey
         {
             Dictionary<IntPtr, Window> knownWindows = GetWindows();
 
-            while (!winListener.CancellationPending) {
+            while (!Cancel) {
                 Thread.Sleep(100); // no cpu hogging
                 IntPtr top = GetForegroundWindow();
                 Stack<IntPtr> openWindows = WinEnum.Enum();
@@ -155,6 +158,7 @@ namespace WinMonkey
                     }
                 }
             }
+            e.Cancel = true;
         }
 
         private void ProcWatcher(object sender, DoWorkEventArgs e)
@@ -165,7 +169,7 @@ namespace WinMonkey
                 knownProcs.Add(p.Id, p);
             }
 
-            while (!procListener.CancellationPending) {
+            while (!Cancel) {
                 Thread.Sleep(100); // don't hog all the cpu
 
                 var current = MonkeyProc.Enum();
@@ -193,6 +197,7 @@ namespace WinMonkey
                     }
                 }
             }
+            e.Cancel = true;
         }
 
         [DllImport("user32.dll")]
