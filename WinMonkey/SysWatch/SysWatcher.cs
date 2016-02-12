@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
-using System.Windows.Forms;
 using System.ComponentModel;
 
-namespace WinMonkey {
-
-    public class SysWatcher : IDisposable {
-
+namespace WinMonkey
+{
+    public class SysWatcher : IDisposable
+    {
         public event EventHandler OnWindowOpen;
         public event EventHandler OnWindowClose;
         public event EventHandler OnWindowFocus;
@@ -23,7 +21,8 @@ namespace WinMonkey {
         public event EventHandler OnProcessStart;
         public event EventHandler OnProcessExit;
 
-        public bool Running {
+        public bool Running
+        {
             get {
                 if (winListener == null || procListener == null) {
                     return false;
@@ -34,7 +33,8 @@ namespace WinMonkey {
             }
         }
 
-        public bool RequestingExit {
+        public bool RequestingExit
+        {
             get {
                 if (!Running) {
                     return false;
@@ -45,7 +45,8 @@ namespace WinMonkey {
 
         private BackgroundWorker winListener, procListener;
 
-        public void BeginWatch() {
+        public void BeginWatch()
+        {
             winListener = new BackgroundWorker() { WorkerSupportsCancellation = true };
             procListener = new BackgroundWorker() { WorkerSupportsCancellation = true };
             winListener.DoWork += WinWatcher;
@@ -54,15 +55,18 @@ namespace WinMonkey {
             procListener.RunWorkerAsync();
         }
 
-        ~SysWatcher() {
+        ~SysWatcher()
+        {
             Dispose();
         }
 
-        public void Dispose() {
+        public void Dispose()
+        {
             EndWatch();
         }
 
-        public void EndWatch() {
+        public void EndWatch()
+        {
             if (Running) {
                 winListener.CancelAsync();
                 procListener.CancelAsync();
@@ -71,7 +75,8 @@ namespace WinMonkey {
             }
         }
 
-        public void UnregisterEvents() {
+        public void UnregisterEvents()
+        {
             OnProcessExit = null;
             OnProcessStart = null;
             OnWindowClose = null;
@@ -85,10 +90,11 @@ namespace WinMonkey {
             OnWindowTitleChange = null;
         }
 
-        private void WinWatcher(object sender, DoWorkEventArgs e) {
-            
+        private void WinWatcher(object sender, DoWorkEventArgs e)
+        {
+
             Dictionary<IntPtr, Window> knownWindows = GetWindows();
-            
+
             while (!winListener.CancellationPending) {
                 Thread.Sleep(100); // no cpu hogging
                 IntPtr top = GetForegroundWindow();
@@ -152,7 +158,8 @@ namespace WinMonkey {
             }
         }
 
-        private void ProcWatcher(object sender, DoWorkEventArgs e) {
+        private void ProcWatcher(object sender, DoWorkEventArgs e)
+        {
             Dictionary<int, MonkeyProc> knownProcs = new Dictionary<int, MonkeyProc>();
 
             foreach (MonkeyProc p in MonkeyProc.Enum()) {
@@ -163,7 +170,7 @@ namespace WinMonkey {
                 Thread.Sleep(100); // don't hog all the cpu
 
                 var current = MonkeyProc.Enum();
-                
+
                 var closed = knownProcs.Values.Except(current, MonkeyProc.ProcessComparer).ToArray(); // 3-21-15 Again, make a copy. The foreach iterator won't be const otherwise
 
                 if (OnProcessExit == null) {
@@ -192,7 +199,8 @@ namespace WinMonkey {
         [DllImport("user32.dll")]
         private static extern IntPtr GetForegroundWindow();
 
-        private Dictionary<IntPtr, Window> GetWindows() {
+        private Dictionary<IntPtr, Window> GetWindows()
+        {
             Dictionary<IntPtr, Window> windows = new Dictionary<IntPtr, Window>();
             Stack<IntPtr> current = WinEnum.Enum();
             IntPtr top = GetForegroundWindow();
@@ -203,7 +211,8 @@ namespace WinMonkey {
             return windows;
         }
 
-        internal class WinEnum {
+        internal class WinEnum
+        {
 
             [DllImport("user32.dll")]
             private static extern int EnumWindows(CallBackPtr callPtr, int lPar);
@@ -213,24 +222,27 @@ namespace WinMonkey {
             private Stack<IntPtr> stack;
             private static CallBackPtr callBackPtr;
 
-            private WinEnum() {
+            private WinEnum()
+            {
                 stack = new Stack<IntPtr>();
             }
 
-            private bool Report(IntPtr hwnd, int lParam) {
+            private bool Report(IntPtr hwnd, int lParam)
+            {
                 stack.Push(hwnd);
                 return true;
             }
 
-            private Stack<IntPtr> GetWindows() {
+            private Stack<IntPtr> GetWindows()
+            {
                 stack = new Stack<IntPtr>();
                 callBackPtr = new CallBackPtr(Report);
                 EnumWindows(callBackPtr, 0);
                 return stack;
             }
-
-
-            public static Stack<IntPtr> Enum() {
+            
+            public static Stack<IntPtr> Enum()
+            {
                 return (new WinEnum()).GetWindows();
             }
         }

@@ -1,19 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Runtime.InteropServices;
 
-namespace WinMonkey {
-    public class FileIO {
+namespace WinMonkey
+{
+    public class FileIO
+    {
         [StructLayout(LayoutKind.Sequential)]
-        private struct FILETIME {
+        private struct FILETIME
+        {
             public uint dwLowDateTime;
             public uint dwHighDateTime;
         }
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-        private struct WIN32_FIND_DATA {
+        private struct WIN32_FIND_DATA
+        {
             public uint dwFileAttributes;
             public FILETIME ftCreationTime;
             public FILETIME ftLastAccessTime;
@@ -35,7 +37,8 @@ namespace WinMonkey {
         [DllImport("kernel32.dll")]
         private static extern bool FindClose(IntPtr hFindFile);
 
-        public static string[] FindFiles(string dir) {
+        public static string[] FindFiles(string dir)
+        {
             List<string> ret = new List<string>();
             WIN32_FIND_DATA data;
             IntPtr handle = FindFirstFile(dir, out data);

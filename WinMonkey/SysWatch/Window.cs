@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace WinMonkey {
-    public class Window : IEquatable<Window> {
-
+namespace WinMonkey
+{
+    public class Window : IEquatable<Window>
+    {
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         private static extern int GetWindowTextLength(IntPtr hWnd);
 
@@ -17,7 +18,8 @@ namespace WinMonkey {
         public IntPtr Handle { get; private set; }
 
         private string title;
-        public string Title {
+        public string Title
+        {
             get {
                 return title;
             }
@@ -30,7 +32,8 @@ namespace WinMonkey {
         }
 
         private bool minimized;
-        public bool Minimized {
+        public bool Minimized
+        {
             get {
                 return minimized;
             }
@@ -43,7 +46,8 @@ namespace WinMonkey {
         }
 
         private bool maximized;
-        public bool Maximized {
+        public bool Maximized
+        {
             get {
                 return maximized;
             }
@@ -56,7 +60,8 @@ namespace WinMonkey {
         }
 
         private bool visible;
-        public bool Visible {
+        public bool Visible
+        {
             get {
                 return visible;
             }
@@ -74,7 +79,8 @@ namespace WinMonkey {
         }
 
         private bool foreground;
-        public bool Foreground {
+        public bool Foreground
+        {
             get {
                 return foreground;
             }
@@ -92,7 +98,8 @@ namespace WinMonkey {
         }
 
         private bool exists;
-        public bool Exists {
+        public bool Exists
+        {
             get {
                 return exists;
             }
@@ -109,13 +116,15 @@ namespace WinMonkey {
             }
         }
 
-        public int QueueCount {
+        public int QueueCount
+        {
             get {
                 return pending.Count;
             }
         }
 
-        public Window(IntPtr hwnd, bool foreground) {
+        public Window(IntPtr hwnd, bool foreground)
+        {
             pending = new Queue<SysEvent>();
             Handle = hwnd;
             exists = true;
@@ -133,12 +142,14 @@ namespace WinMonkey {
             title = GetTitle();
         }
 
-        public void Update(bool foreground) {
+        public void Update(bool foreground)
+        {
             Foreground = foreground;
             RefreshState(Handle);
         }
 
-        private string GetTitle() {
+        private string GetTitle()
+        {
             int len = GetWindowTextLength(Handle) + 1;
             if (len > 0) {
                 StringBuilder sb = new StringBuilder(len);
@@ -150,15 +161,18 @@ namespace WinMonkey {
             }
         }
 
-        public SysEvent Dequeue() {
+        public SysEvent Dequeue()
+        {
             return pending.Dequeue();
         }
 
-        public bool IsTitleEmpty() {
+        public bool IsTitleEmpty()
+        {
             return Title == null || Title.Equals("");
         }
 
-        private void RefreshState(IntPtr hwnd) {
+        private void RefreshState(IntPtr hwnd)
+        {
             Visible = IsWindowVisible(hwnd);
             //Enabled = IsWindowEnabled(hwnd);
 
@@ -175,7 +189,8 @@ namespace WinMonkey {
         [return: MarshalAs(UnmanagedType.Bool)]
         private static extern bool GetWindowPlacement(IntPtr hWnd, ref WINDOWPLACEMENT lpwndpl);
 
-        private struct WINDOWPLACEMENT {
+        private struct WINDOWPLACEMENT
+        {
             public int length;
             public int flags;
             public int showCmd;
@@ -184,11 +199,13 @@ namespace WinMonkey {
             public System.Drawing.Rectangle rcNormalPosition;
         }
 
-        public bool Equals(Window other) {
+        public bool Equals(Window other)
+        {
             return Handle == other.Handle;
         }
 
-        public override bool Equals(object obj) {
+        public override bool Equals(object obj)
+        {
             if (obj is Window) {
                 return Equals((Window)obj);
             }
@@ -197,7 +214,8 @@ namespace WinMonkey {
             }
         }
 
-        public override int GetHashCode() {
+        public override int GetHashCode()
+        {
             return Handle.GetHashCode();
         }
 
@@ -210,7 +228,8 @@ namespace WinMonkey {
         private static extern bool IsWindowEnabled(IntPtr hWnd);*/
     }
 
-    public struct W_STATES {
+    public struct W_STATES
+    {
         const UInt32 SW_HIDE = 0;
         const UInt32 SW_SHOWNORMAL = 1;
         const UInt32 SW_NORMAL = 1;

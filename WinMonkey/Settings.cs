@@ -3,20 +3,23 @@ using System.IO;
 using System.Xml;
 using System.Xml.XPath;
 
-namespace WinMonkey {
-    public class Settings {
-
+namespace WinMonkey
+{
+    public class Settings
+    {
         public string Path { get; set; }
-        
+
         private XmlDocument doc;
 
-        public XmlNode DocumentElement {
+        public XmlNode DocumentElement
+        {
             get {
                 return doc.DocumentElement;
             }
         }
 
-        public XmlDocument Document {
+        public XmlDocument Document
+        {
             get {
                 return doc;
             }
@@ -24,16 +27,19 @@ namespace WinMonkey {
 
         private const string ROOT = "config";
 
-        public Settings() {
+        public Settings()
+        {
             doc = new XmlDocument();
         }
 
-        public void Load(string path) {
+        public void Load(string path)
+        {
             Path = path;
             Load();
         }
 
-        public void Load() {
+        public void Load()
+        {
             try {
                 doc.Load(Path);
             }
@@ -47,11 +53,13 @@ namespace WinMonkey {
             }
         }
 
-        public string GetString(string xpath) {
+        public string GetString(string xpath)
+        {
             return GetString(xpath, null);
         }
 
-        public string GetString(string xpath, string defaultValue) {
+        public string GetString(string xpath, string defaultValue)
+        {
             try {
                 XmlNode n = doc.SelectSingleNode(ROOT + "/" + xpath);
                 if (n == null) {
@@ -64,11 +72,13 @@ namespace WinMonkey {
             }
         }
 
-        public int GetInt(string xpath) {
+        public int GetInt(string xpath)
+        {
             return GetInt(xpath, 0);
         }
 
-        public int GetInt(string xpath, int defaultValue) {
+        public int GetInt(string xpath, int defaultValue)
+        {
             try {
                 return int.Parse(GetString(xpath, ""));
             }
@@ -77,11 +87,13 @@ namespace WinMonkey {
             }
         }
 
-        public double GetDouble(string xpath) {
+        public double GetDouble(string xpath)
+        {
             return GetDouble(xpath, 0.0);
         }
 
-        public double GetDouble(string xpath, double defaultValue) {
+        public double GetDouble(string xpath, double defaultValue)
+        {
             try {
                 return double.Parse(GetString(xpath, ""));
             }
@@ -90,11 +102,13 @@ namespace WinMonkey {
             }
         }
 
-        public bool GetBool(string xpath) {
+        public bool GetBool(string xpath)
+        {
             return GetBool(xpath, false);
         }
 
-        public bool GetBool(string xpath, bool defaultValue) {
+        public bool GetBool(string xpath, bool defaultValue)
+        {
             try {
                 return bool.Parse(GetString(xpath, ""));
             }
@@ -103,24 +117,29 @@ namespace WinMonkey {
             }
         }
 
-        public void Save() {
+        public void Save()
+        {
             doc.Save(Path);
         }
 
-        public void Save(string path) {
+        public void Save(string path)
+        {
             doc.Save(Path = path);
         }
 
-        public void Set(string xpath, string s) {
+        public void Set(string xpath, string s)
+        {
             XmlNode node = FindOrCreate(doc.DocumentElement, xpath.Split('/'), 0);
             node.InnerText = s;
         }
 
-        public void Set(string xpath, object o) {
+        public void Set(string xpath, object o)
+        {
             Set(xpath, o + "");
         }
 
-        private XmlNode FindOrCreate(XmlNode root, string[] path, int index) {
+        private XmlNode FindOrCreate(XmlNode root, string[] path, int index)
+        {
             XmlNode n = root.SelectSingleNode(path[index]);
             if (n == null) {
                 n = doc.CreateElement(path[index]);

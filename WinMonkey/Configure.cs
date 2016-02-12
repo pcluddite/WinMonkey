@@ -8,21 +8,23 @@ using System.Security;
 using System.Windows.Forms;
 using System.Xml;
 
-namespace WinMonkey {
-    public partial class Configure : Form {
-
+namespace WinMonkey
+{
+    public partial class Configure : Form
+    {
         private bool showform;
         private ScriptManager scriptMan;
         private PipeWatcher pipeWatcher;
         private Settings settings;
         private readonly string SettingsPath = Path.Combine(Application.StartupPath, "Settings.xml");
 
-        public Configure(bool show) {
+        public Configure(bool show)
+        {
             showform = show;
             pipeWatcher = new PipeWatcher(this);
             pipeWatcher.Begin();
             settings = new Settings();
-            InitializeComponent(); 
+            InitializeComponent();
             settings.Load(SettingsPath);
 
             showTrayMessagesToolStripMenuItem.Checked = settings.GetBool("notify", true);
@@ -52,11 +54,13 @@ namespace WinMonkey {
             enableButton_Click(null, EventArgs.Empty);
         }
 
-        private void Configure_Load(object sender, EventArgs e) {
-            
+        private void Configure_Load(object sender, EventArgs e)
+        {
+
         }
 
-        protected override void SetVisibleCore(bool value) {
+        protected override void SetVisibleCore(bool value)
+        {
             if (showform) {
                 base.SetVisibleCore(value);
             }
@@ -66,7 +70,8 @@ namespace WinMonkey {
             }
         }
 
-        private void enableButton_Click(object sender, EventArgs e) {
+        private void enableButton_Click(object sender, EventArgs e)
+        {
             if (scriptMan.Watcher.Running) {
                 scriptMan.Watcher.EndWatch();
                 enableButton.BackColor = Color.FromArgb(0, 192, 0);
@@ -79,7 +84,8 @@ namespace WinMonkey {
             }
         }
 
-        private void deleteButton_Click(object sender, EventArgs e) {
+        private void deleteButton_Click(object sender, EventArgs e)
+        {
             if (listView1.SelectedItems.Count == 1) {
                 DialogResult result = MessageBox.Show(this, "Are you sure you want to delete this event?", Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (result == DialogResult.Yes) {
@@ -103,19 +109,22 @@ namespace WinMonkey {
             ResetAssociations();
         }
 
-        private void Configure_SizeChanged(object sender, EventArgs e) {
+        private void Configure_SizeChanged(object sender, EventArgs e)
+        {
             if (WindowState == FormWindowState.Minimized) {
                 Hide();
                 WindowState = FormWindowState.Normal;
             }
         }
 
-        private void notifyIcon1_MouseDoubleClick(object sender, MouseEventArgs e) {
+        private void notifyIcon1_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
             Show();
             WindowState = FormWindowState.Normal;
         }
 
-        private void Configure_FormClosed(object sender, FormClosedEventArgs e) {
+        private void Configure_FormClosed(object sender, FormClosedEventArgs e)
+        {
             try {
                 scriptMan.Watcher.EndWatch();
             }
@@ -126,7 +135,8 @@ namespace WinMonkey {
             }
         }
 
-        private void RunOnStartup(bool doRun) {
+        private void RunOnStartup(bool doRun)
+        {
             try {
                 using (RegistryKey runKey = Registry.CurrentUser.OpenSubKey(RUN_KEY_PATH, true)) {
                     if (doRun) {
@@ -144,14 +154,16 @@ namespace WinMonkey {
 
         private const string RUN_KEY_PATH = @"Software\Microsoft\Windows\CurrentVersion\Run";
 
-        private static bool IsStartup() {
+        private static bool IsStartup()
+        {
             using (RegistryKey runKey = Registry.CurrentUser.OpenSubKey(RUN_KEY_PATH)) {
                 return runKey.GetValueNames().Contains("WinMonkey");
             }
         }
 
-        private void Configure_FormClosing(object sender, FormClosingEventArgs e) {
-            if (!skipCloseWarning && e.CloseReason == CloseReason.UserClosing)  {
+        private void Configure_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (!skipCloseWarning && e.CloseReason == CloseReason.UserClosing) {
                 DialogResult result = MessageBox.Show(this, "If you close WindowMonkey, it will be unable to listen to events and run scripts automatically. Are you sure you want to quit?", "WindowMonkey", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (result == DialogResult.No) {
                     e.Cancel = true;
@@ -160,7 +172,7 @@ namespace WinMonkey {
                 }
             }
             RunOnStartup(checkBox1.Checked);
-            
+
             settings.Set("notify", showTrayMessagesToolStripMenuItem.Checked);
 
             XmlNode scriptsNode = settings.DocumentElement.SelectSingleNode("scripts");
@@ -179,7 +191,7 @@ namespace WinMonkey {
             try {
                 settings.Save(SettingsPath);
             }
-            catch(Exception ex) {
+            catch (Exception ex) {
                 if (MessageBox.Show(this, ex.Message + "\nBasically, there was a problem saving your settings file. If you exit now, your settings won't be saved. Do you still want to quit?", Text, MessageBoxButtons.YesNo, MessageBoxIcon.Error) == System.Windows.Forms.DialogResult.No) {
                     e.Cancel = true;
                     return;
@@ -189,25 +201,30 @@ namespace WinMonkey {
         }
 
         private bool skipCloseWarning = false;
-        private void exitWindowMonkeyToolStripMenuItem_Click(object sender, EventArgs e) {
+        private void exitWindowMonkeyToolStripMenuItem_Click(object sender, EventArgs e)
+        {
             skipCloseWarning = true;
             Close();
         }
 
-        private void showToolStripMenuItem_Click(object sender, EventArgs e) {
+        private void showToolStripMenuItem_Click(object sender, EventArgs e)
+        {
             Show();
             WindowState = FormWindowState.Normal;
         }
 
-        private void runOnWindowsStartupToolStripMenuItem_Click(object sender, EventArgs e) {
+        private void runOnWindowsStartupToolStripMenuItem_Click(object sender, EventArgs e)
+        {
             checkBox1.Checked = runOnWindowsStartupToolStripMenuItem.Checked;
         }
 
-        private void checkBox1_CheckedChanged(object sender, EventArgs e) {
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
             runOnWindowsStartupToolStripMenuItem.Checked = checkBox1.Checked;
         }
 
-        private void newButton_Click(object sender, EventArgs e) {
+        private void newButton_Click(object sender, EventArgs e)
+        {
             ListViewItem item = new ListViewItem("");
             item.SubItems.Add("");
             item.SubItems.Add("");
@@ -218,7 +235,8 @@ namespace WinMonkey {
             }
         }
 
-        private void editMenuItem_Click(object sender, EventArgs e) {
+        private void editMenuItem_Click(object sender, EventArgs e)
+        {
             if (listView1.SelectedItems.Count > 0) {
                 EditScript scriptEditor = new EditScript(listView1.SelectedItems[0]);
                 if (scriptEditor.ShowDialog() == DialogResult.Yes) {
@@ -227,11 +245,13 @@ namespace WinMonkey {
             }
         }
 
-        private void listView1_MouseDoubleClick(object sender, MouseEventArgs e) {
+        private void listView1_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
             editMenuItem_Click(sender, e);
         }
 
-        private void ResetAssociations() {
+        private void ResetAssociations()
+        {
             List<Script> scripts = new List<Script>();
             foreach (ListViewItem item in listView1.Items) {
                 scripts.Add(FromListViewItem(item));
@@ -239,7 +259,8 @@ namespace WinMonkey {
             scriptMan.ResetAssociations(scripts);
         }
 
-        private static Script FromListViewItem(ListViewItem item) {
+        private static Script FromListViewItem(ListViewItem item)
+        {
             return new Script(
                     item.Tag + "",
                     item.Text,
@@ -248,11 +269,13 @@ namespace WinMonkey {
 
         }
 
-        private void showTrayMessagesToolStripMenuItem_Click(object sender, EventArgs e) {
+        private void showTrayMessagesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
             scriptMan.NotifyIcon = showTrayMessagesToolStripMenuItem.Checked ? notifyIcon1 : null;
         }
 
-        private void contextMenuStrip2_Opening(object sender, System.ComponentModel.CancelEventArgs e) {
+        private void contextMenuStrip2_Opening(object sender, System.ComponentModel.CancelEventArgs e)
+        {
             if (listView1.SelectedItems.Count == 0) {
                 toolStripSeparator2.Visible = false;
                 deleteEventToolStripMenuItem.Visible = false;

@@ -1,11 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Windows.Forms;
 
-namespace WinMonkey {
-    public class ScriptManager {
-
+namespace WinMonkey
+{
+    public class ScriptManager
+    {
         public SysWatcher Watcher { get; private set; }
-        public NotifyIcon NotifyIcon {
+        public NotifyIcon NotifyIcon
+        {
             get {
                 return SysEvent.Icon;
             }
@@ -13,19 +15,21 @@ namespace WinMonkey {
                 SysEvent.Icon = value;
             }
         }
-        
+
         private List<SysEvent> allEvents;
 
-        public ScriptManager(NotifyIcon icon, IEnumerable<Script> scripts) {
+        public ScriptManager(NotifyIcon icon, IEnumerable<Script> scripts)
+        {
             NotifyIcon = icon;
             Watcher = new SysWatcher();
-            allEvents = new List<SysEvent>(); 
+            allEvents = new List<SysEvent>();
             foreach (Script s in scripts) {
                 AddScript(s);
             }
         }
-        
-        public void AddScript(Script script) {
+
+        public void AddScript(Script script)
+        {
             if (!allEvents.Contains(script.TriggerEvent)) {
                 SysEvent info = script.TriggerEvent;
                 switch (script.TriggerEvent.Id) {
@@ -68,7 +72,8 @@ namespace WinMonkey {
             script.TriggerEvent.AddScript(script);
         }
 
-        public IEnumerable<Script> GetScripts() {
+        public IEnumerable<Script> GetScripts()
+        {
             List<Script> scripts = new List<Script>();
             foreach (SysEvent einfo in allEvents) {
                 scripts.AddRange(einfo.GetScripts());
@@ -76,7 +81,8 @@ namespace WinMonkey {
             return scripts;
         }
 
-        public void ResetAssociations(IEnumerable<Script> scripts) {
+        public void ResetAssociations(IEnumerable<Script> scripts)
+        {
             Watcher.UnregisterEvents();
             foreach (SysEvent einfo in allEvents) {
                 einfo.ClearScripts();

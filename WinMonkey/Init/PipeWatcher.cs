@@ -3,26 +3,29 @@ using System.IO.Pipes;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
-using Tbasic.Libraries;
 
-namespace WinMonkey {
-    public class PipeWatcher {
-
+namespace WinMonkey
+{
+    public class PipeWatcher
+    {
         private const string PIPENAME = "WindowMonkey";
         private Form main;
 
-        public PipeWatcher(Form main) {
+        public PipeWatcher(Form main)
+        {
             this.main = main;
         }
 
-        public void Begin() {
+        public void Begin()
+        {
             Thread t = new Thread(new ThreadStart(Init));
             t.Start();
         }
 
-        private void Init() {
+        private void Init()
+        {
             if (PipeExists(PIPENAME)) {
-                using (NamedPipeClientStream client = new NamedPipeClientStream(PIPENAME)) { 
+                using (NamedPipeClientStream client = new NamedPipeClientStream(PIPENAME)) {
                     try {
                         client.Connect(2000);
                         byte[] data = Encoding.ASCII.GetBytes("SHOW");
@@ -41,7 +44,8 @@ namespace WinMonkey {
                 int count = server.Read(data, 0, data.Length);
                 string msg = Encoding.ASCII.GetString(data, 0, count).ToUpper();
                 if (msg.Equals("SHOW")) {
-                    main.Invoke(new MethodInvoker(delegate { 
+                    main.Invoke(new MethodInvoker(delegate
+                    {
                         main.Show();
                         main.WindowState = FormWindowState.Normal;
                     }));
@@ -56,7 +60,8 @@ namespace WinMonkey {
             }
         }
 
-        private static bool PipeExists(string pipe) {
+        private static bool PipeExists(string pipe)
+        {
             foreach (string s in FileIO.FindFiles(@"\\.\pipe\*")) {
                 if (s.Equals(pipe)) {
                     return true;

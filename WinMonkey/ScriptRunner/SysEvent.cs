@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
-using System.Diagnostics;
 
-namespace WinMonkey {
-
-    public class SysEvent {
-
+namespace WinMonkey
+{
+    public class SysEvent
+    {
         public const int NONE = 0;
         public const int WINOPEN = 1;
         public const int WINCLOSE = 2;
@@ -51,31 +49,36 @@ namespace WinMonkey {
                 OnProcessExit
         };
 
-        public static SysEvent GetFromShort(string name) {
+        public static SysEvent GetFromShort(string name)
+        {
             return (from v in AllEvents
                     where v.Name.Equals(name)
                     select v).First();
         }
 
-        public static SysEvent GetFromPlainText(string verb) {
+        public static SysEvent GetFromPlainText(string verb)
+        {
             return (from v in AllEvents
                     where v.PlainText != null && v.PlainText.Equals(verb)
                     select v).First();
         }
 
-        public static string GetShortName(int opt) {
+        public static string GetShortName(int opt)
+        {
             return (from v in AllEvents
                     where v.Id == opt
                     select v).First().Name;
         }
 
-        public static Verb GetPlainText(int opt) {
+        public static Verb GetPlainText(int opt)
+        {
             return (from v in AllEvents
                     where v.Id == opt
                     select v).First().PlainText;
         }
 
-        public static SysEvent FromId(int id) {
+        public static SysEvent FromId(int id)
+        {
             return (from v in AllEvents
                     where v.Id == id
                     select v).First();
@@ -88,21 +91,25 @@ namespace WinMonkey {
         public Verb PlainText { get; private set; }
         public string Name { get; private set; }
 
-        private SysEvent(int id, string _name, Verb _verb) {
+        private SysEvent(int id, string _name, Verb _verb)
+        {
             Id = id;
             PlainText = _verb;
             Name = _name;
             scripts = new List<Script>();
         }
-        public void ClearScripts() {
+        public void ClearScripts()
+        {
             scripts.Clear();
         }
 
-        public void AddScript(Script s) {
+        public void AddScript(Script s)
+        {
             scripts.Add(s);
         }
 
-        public void OnEvent(object sender, EventArgs e) {
+        public void OnEvent(object sender, EventArgs e)
+        {
             if (sender is Window) {
                 Window w = (Window)sender;
                 foreach (Script s in scripts) {
@@ -121,15 +128,18 @@ namespace WinMonkey {
             }
         }
 
-        public Script[] GetScripts() {
+        public Script[] GetScripts()
+        {
             return scripts.ToArray();
         }
 
 
-        public class Verb : IEquatable<string> {
+        public class Verb : IEquatable<string>
+        {
 
             private string pres;
-            public virtual string Present {
+            public virtual string Present
+            {
                 get {
                     return pres + " " + DirectObject;
                 }
@@ -138,7 +148,8 @@ namespace WinMonkey {
                 }
             }
             private string past;
-            public virtual string Past {
+            public virtual string Past
+            {
                 get {
                     return past + " " + DirectObject;
                 }
@@ -148,30 +159,36 @@ namespace WinMonkey {
             }
             public virtual string DirectObject { get; set; }
 
-            protected Verb() {
+            protected Verb()
+            {
             }
 
-            public Verb(string _present, string _past) {
+            public Verb(string _present, string _past)
+            {
                 Present = _present;
                 Past = _past;
             }
 
-            public override string ToString() {
+            public override string ToString()
+            {
                 return Present + " " + DirectObject;
             }
 
-            public bool Equals(string other) {
+            public bool Equals(string other)
+            {
                 return other.Equals(Present) || other.Equals(Past);
             }
         }
 
-        public class PassiveVerb : Verb {
+        public class PassiveVerb : Verb
+        {
 
             public string PresentAuxiliary { get; set; }
             public string PastAuxiliary { get; set; }
             public string PassiveParticple { get; set; }
 
-            public override string Present {
+            public override string Present
+            {
                 get {
                     return PresentAuxiliary + " " + PassiveParticple;
                 }
@@ -180,7 +197,8 @@ namespace WinMonkey {
                 }
             }
 
-            public override string Past {
+            public override string Past
+            {
                 get {
                     return PastAuxiliary + " " + PassiveParticple;
                 }
@@ -190,16 +208,19 @@ namespace WinMonkey {
             }
 
             public PassiveVerb(string _pparticple)
-                : this("is", "was", _pparticple) {
+                : this("is", "was", _pparticple)
+            {
             }
 
-            public PassiveVerb(string _presentAux, string _pastAux, string _pparticiple) {
+            public PassiveVerb(string _presentAux, string _pastAux, string _pparticiple)
+            {
                 PresentAuxiliary = _presentAux;
                 PastAuxiliary = _pastAux;
                 PassiveParticple = _pparticiple;
             }
 
-            public override string ToString() {
+            public override string ToString()
+            {
                 return PresentAuxiliary + " " + PassiveParticple;
             }
         }
