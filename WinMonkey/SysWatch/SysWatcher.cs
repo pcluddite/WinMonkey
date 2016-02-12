@@ -92,7 +92,6 @@ namespace WinMonkey
 
         private void WinWatcher(object sender, DoWorkEventArgs e)
         {
-
             Dictionary<IntPtr, Window> knownWindows = GetWindows();
 
             while (!winListener.CancellationPending) {
@@ -213,7 +212,6 @@ namespace WinMonkey
 
         internal class WinEnum
         {
-
             [DllImport("user32.dll")]
             private static extern int EnumWindows(CallBackPtr callPtr, int lPar);
 

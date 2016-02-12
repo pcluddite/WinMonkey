@@ -32,8 +32,7 @@ namespace WinMonkey
         public static readonly SysEvent OnWindowNoFocus = new SysEvent(WINNOFOCUS, "OnWindowNoFocus", new Verb("loses", "lost") { DirectObject = "focus" });
         public static readonly SysEvent OnProcessStart = new SysEvent(PROCSTART, "OnProcessStart", new Verb("starts", "started"));
         public static readonly SysEvent OnProcessExit = new SysEvent(PROCEXIT, "OnProcessExit", new Verb("exits", "exitted"));
-
-
+        
         public static readonly SysEvent[] AllEvents = {
                 None,
                 OnWindowOpen,
@@ -110,27 +109,29 @@ namespace WinMonkey
 
         public void OnEvent(object sender, EventArgs e)
         {
-            if (sender is Window) {
-                Window w = (Window)sender;
+            Window w = sender as Window;
+            if (w != null) {
                 foreach (Script s in scripts) {
                     if (w.Title.Equals(s.TriggerName)) {
                         s.Run(Icon);
                     }
                 }
             }
-            else if (sender is MonkeyProc) {
-                MonkeyProc p = (MonkeyProc)sender;
-                foreach (Script s in scripts) {
-                    if (p.Name.Equals(s.TriggerName)) {
-                        s.Run(Icon);
+            else {
+                MonkeyProc p = sender as MonkeyProc;
+                if (p != null) {
+                    foreach (Script s in scripts) {
+                        if (p.Name.Equals(s.TriggerName)) {
+                            s.Run(Icon);
+                        }
                     }
                 }
             }
         }
 
-        public Script[] GetScripts()
+        public ICollection<Script> GetScripts()
         {
-            return scripts.ToArray();
+            return scripts.ToArray(); // make a copy of the collection
         }
 
 

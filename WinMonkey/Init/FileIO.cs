@@ -37,7 +37,7 @@ namespace WinMonkey
         [DllImport("kernel32.dll")]
         private static extern bool FindClose(IntPtr hFindFile);
 
-        public static string[] FindFiles(string dir)
+        public static ICollection<string> FindFiles(string dir)
         {
             List<string> ret = new List<string>();
             WIN32_FIND_DATA data;
@@ -49,7 +49,7 @@ namespace WinMonkey
                 while (FindNextFile(handle, out data) != 0);
                 FindClose(handle);
             }
-            return ret.ToArray();
+            return ret;
         }
     }
 }
