@@ -12,11 +12,15 @@ namespace WinMonkey
 {
     public partial class Configure : Form
     {
-        private bool showform;
         private ScriptManager scriptMan;
         private PipeWatcher pipeWatcher;
         private Settings settings;
+
+        private bool showform;
+        private bool skipCloseWarning = false;
+
         private readonly string SettingsPath = Path.Combine(Application.StartupPath, "Settings.xml");
+        private const string RUN_KEY_PATH = @"Software\Microsoft\Windows\CurrentVersion\Run";
 
         public Configure(bool show)
         {
@@ -39,13 +43,13 @@ namespace WinMonkey
                     item.Tag = script.FilePath;
                     item.SubItems.Add(script.TriggerEvent.Name);
                     item.SubItems.Add(Path.GetFileName(script.FilePath));
-                    listView1.Items.Add(item);
+                    scriptListView.Items.Add(item);
                     scripts.Add(script);
                 }
             }
 
             if (showTrayMessagesToolStripMenuItem.Checked) {
-                scriptMan = new ScriptManager(notifyIcon1, scripts);
+                scriptMan = new ScriptManager(notifyIcon, scripts);
             }
             else {
                 scriptMan = new ScriptManager(null, scripts);
@@ -86,23 +90,23 @@ namespace WinMonkey
 
         private void deleteButton_Click(object sender, EventArgs e)
         {
-            if (listView1.SelectedItems.Count == 1) {
+            if (scriptListView.SelectedItems.Count == 1) {
                 DialogResult result = MessageBox.Show(this, "Are you sure you want to delete this event?", Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (result == DialogResult.Yes) {
-                    listView1.Items.Remove(listView1.SelectedItems[0]);
+                    scriptListView.Items.Remove(scriptListView.SelectedItems[0]);
                 }
             }
-            else if (listView1.SelectedItems.Count > 1) {
+            else if (scriptListView.SelectedItems.Count > 1) {
                 DialogResult result = MessageBox.Show(this, "Are you sure you want to delete these " +
-                    listView1.SelectedItems.Count +
+                    scriptListView.SelectedItems.Count +
                 " events?", Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (result == DialogResult.Yes) {
                     List<ListViewItem> toRemove = new List<ListViewItem>();
-                    foreach (ListViewItem item in listView1.SelectedItems) {
+                    foreach (ListViewItem item in scriptListView.SelectedItems) {
                         toRemove.Add(item);
                     }
                     foreach (ListViewItem item in toRemove) {
-                        listView1.Items.Remove(item);
+                        scriptListView.Items.Remove(item);
                     }
                 }
             }
@@ -152,8 +156,6 @@ namespace WinMonkey
             }
         }
 
-        private const string RUN_KEY_PATH = @"Software\Microsoft\Windows\CurrentVersion\Run";
-
         private static bool IsStartup()
         {
             using (RegistryKey runKey = Registry.CurrentUser.OpenSubKey(RUN_KEY_PATH)) {
@@ -197,10 +199,9 @@ namespace WinMonkey
                     return;
                 }
             }
-            notifyIcon1.Visible = false;
+            notifyIcon.Visible = false;
         }
 
-        private bool skipCloseWarning = false;
         private void exitWindowMonkeyToolStripMenuItem_Click(object sender, EventArgs e)
         {
             skipCloseWarning = true;
@@ -230,15 +231,15 @@ namespace WinMonkey
             item.SubItems.Add("");
             EditScript scriptEditor = new EditScript(item);
             if (scriptEditor.ShowDialog() == DialogResult.Yes) {
-                listView1.Items.Add(item);
+                scriptListView.Items.Add(item);
                 ResetAssociations();
             }
         }
 
         private void editMenuItem_Click(object sender, EventArgs e)
         {
-            if (listView1.SelectedItems.Count > 0) {
-                EditScript scriptEditor = new EditScript(listView1.SelectedItems[0]);
+            if (scriptListView.SelectedItems.Count > 0) {
+                EditScript scriptEditor = new EditScript(scriptListView.SelectedItems[0]);
                 if (scriptEditor.ShowDialog() == DialogResult.Yes) {
                     ResetAssociations();
                 }
@@ -253,7 +254,7 @@ namespace WinMonkey
         private void ResetAssociations()
         {
             List<Script> scripts = new List<Script>();
-            foreach (ListViewItem item in listView1.Items) {
+            foreach (ListViewItem item in scriptListView.Items) {
                 scripts.Add(FromListViewItem(item));
             }
             scriptMan.ResetAssociations(scripts);
@@ -271,17 +272,17 @@ namespace WinMonkey
 
         private void showTrayMessagesToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            scriptMan.NotifyIcon = showTrayMessagesToolStripMenuItem.Checked ? notifyIcon1 : null;
+            scriptMan.NotifyIcon = showTrayMessagesToolStripMenuItem.Checked ? notifyIcon : null;
         }
 
-        private void contextMenuStrip2_Opening(object sender, System.ComponentModel.CancelEventArgs e)
+        private void contextMenuStrip_Opening(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if (listView1.SelectedItems.Count == 0) {
+            if (scriptListView.SelectedItems.Count == 0) {
                 toolStripSeparator2.Visible = false;
                 deleteEventToolStripMenuItem.Visible = false;
                 editToolStripMenuItem.Visible = false;
             }
-            else if (listView1.SelectedItems.Count == 1) {
+            else if (scriptListView.SelectedItems.Count == 1) {
                 toolStripSeparator2.Visible = true;
                 deleteEventToolStripMenuItem.Visible = true;
                 editToolStripMenuItem.Visible = true;
