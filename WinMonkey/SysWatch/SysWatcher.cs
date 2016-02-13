@@ -165,14 +165,14 @@ namespace WinMonkey
         {
             Dictionary<int, MonkeyProc> knownProcs = new Dictionary<int, MonkeyProc>();
 
-            foreach (MonkeyProc p in MonkeyProc.Enum()) {
+            foreach (MonkeyProc p in MonkeyProc.GetProcesses()) {
                 knownProcs.Add(p.Id, p);
             }
 
             while (!Cancel) {
                 Thread.Sleep(100); // don't hog all the cpu
 
-                var current = MonkeyProc.Enum();
+                var current = MonkeyProc.GetProcesses();
 
                 var closed = knownProcs.Values.Except(current, MonkeyProc.ProcessComparer).ToArray(); // 3-21-15 Again, make a copy. The foreach iterator won't be const otherwise
 

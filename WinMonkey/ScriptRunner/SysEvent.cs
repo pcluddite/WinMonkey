@@ -118,10 +118,10 @@ namespace WinMonkey
                 }
             }
             else {
-                MonkeyProc p = sender as MonkeyProc;
+                MonkeyProc? p = sender as MonkeyProc?;
                 if (p != null) {
                     foreach (Script s in scripts) {
-                        if (p.Name.Equals(s.TriggerName)) {
+                        if (p.Value.Name.Equals(s.TriggerName)) {
                             s.Run(Icon);
                         }
                     }

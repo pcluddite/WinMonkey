@@ -4,12 +4,12 @@ using System.Diagnostics;
 
 namespace WinMonkey
 {
-    public class MonkeyProc : IEquatable<MonkeyProc>
+    public struct MonkeyProc : IEquatable<MonkeyProc>
     {
+        public static readonly IEqualityComparer<MonkeyProc> ProcessComparer = new ProcComparer();
+
         public string Name { get; private set; }
         public int Id { get; private set; }
-
-        public static readonly IEqualityComparer<MonkeyProc> ProcessComparer = new ProcComparer();
 
         public MonkeyProc(int id)
         {
@@ -28,24 +28,41 @@ namespace WinMonkey
             return Id == other.Id;
         }
 
-        public static IEnumerable<MonkeyProc> Enum()
+        public override int GetHashCode()
+        {
+            return Id.GetHashCode();
+        }
+
+        public override bool Equals(object obj)
+        {
+            MonkeyProc? proc = obj as MonkeyProc?;
+            if (proc != null)
+                return Equals(proc);
+            return base.Equals(obj);
+        }
+
+        public static bool operator ==(MonkeyProc left, MonkeyProc right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(MonkeyProc left, MonkeyProc right)
+        {
+            return !left.Equals(right);
+        }
+
+        public static IEnumerable<MonkeyProc> GetProcesses()
         {
             foreach (Process p in Process.GetProcesses()) {
                 yield return new MonkeyProc(p);
             }
         }
 
-        public override int GetHashCode()
-        {
-            return Id.GetHashCode();
-        }
-
         private class ProcComparer : IEqualityComparer<MonkeyProc>
         {
-
             public bool Equals(MonkeyProc x, MonkeyProc y)
             {
-                return x.Id == y.Id;
+                return x.Equals(y);
             }
 
             public int GetHashCode(MonkeyProc obj)
