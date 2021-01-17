@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("WinMonkey")]
-[assembly: AssemblyCopyright("Copyright (c) 2014-2015 Timothy Baxendale")]
+[assembly: AssemblyCopyright("Copyright (c) 2014-2021 Timothy Baxendale")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

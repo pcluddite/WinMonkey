@@ -57,6 +57,19 @@
     <Compile Include="EditScript.Designer.cs">
       <DependentUpon>EditScript.cs</DependentUpon>
     </Compile>
+    <Compile Include="AppRuntime.cs" />
+    <Compile Include="Forms\ConfigureForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ConfigureForm.Designer.cs">
+      <DependentUpon>ConfigureForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\EditScriptForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\EditScriptForm.Designer.cs">
+      <DependentUpon>EditScriptForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Init\FileIO.cs" />
     <Compile Include="Init\PipeWatcher.cs" />
     <Compile Include="Init\Program.cs" />
@@ -87,6 +100,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="EditScript.resx">
       <DependentUpon>EditScript.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ConfigureForm.resx">
+      <DependentUpon>ConfigureForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\EditScriptForm.resx">
+      <DependentUpon>EditScriptForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

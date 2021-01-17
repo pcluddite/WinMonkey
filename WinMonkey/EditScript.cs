@@ -42,7 +42,7 @@ namespace WinMonkey
 
         private void cancelButton_Click(object sender, EventArgs e)
         {
-            DialogResult = Forms.DialogResult.No;
+            DialogResult = System.Windows.Forms.DialogResult.No;
             Close();
         }
 
@@ -58,7 +58,7 @@ namespace WinMonkey
                 toolTip1.Show("The window/process must have a name", textBox2);
             }
             else {
-                DialogResult = Forms.DialogResult.Yes;
+                DialogResult = System.Windows.Forms.DialogResult.Yes;
                 item.Text = textBox2.Text;
                 item.Tag = openFileDialog1.FileName;
                 item.SubItems[1].Text = SysEvent.GetFromPlainText(comboBox1.SelectedItem.ToString()).Name;

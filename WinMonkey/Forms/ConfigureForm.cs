@@ -18,19 +18,37 @@
  *     
 **/
 using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.IO;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml;
 
-namespace WinMonkey
+namespace WinMonkey.Forms
 {
-    public class Program
+    internal partial class ConfigureForm : Form
     {
-        [STAThread]
-        public static void Main(string[] args)
+        private AppRuntime runtime;
+
+        public ConfigureForm(AppRuntime runtime)
         {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new AppRuntime(!(args.Length > 0 && args.Contains("--startup", StringComparer.OrdinalIgnoreCase))));
+            this.runtime = runtime;
+            InitializeComponent();
+        }
+
+        protected override void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
+            LoadScripts(runtime.ScriptManager);
+        }
+
+        private void LoadScripts(ScriptManager scripts)
+        {
         }
     }
 }

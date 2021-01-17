@@ -79,5 +79,15 @@ namespace WinMonkey.Properties {
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon IconGear {
+            get {
+                object obj = ResourceManager.GetObject("IconGear", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
     }
 }
