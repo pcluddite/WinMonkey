@@ -38,7 +38,7 @@
     <StartupObject>WinMonkey.Program</StartupObject>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Resources\WinMonkey.ico</ApplicationIcon>
+    <ApplicationIcon>Resources\Iconsmind-Outline-Gear.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -97,6 +97,7 @@
     <None Include="Resources\background.png" />
     <None Include="Resources\script.png" />
     <None Include="Resources\background2.png" />
+    <Content Include="Resources\Iconsmind-Outline-Gear.ico" />
     <Content Include="Resources\WinMonkey.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
